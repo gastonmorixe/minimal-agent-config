@@ -37,6 +37,17 @@ Then make three small edits per repo.
 Keep the local `$schema` and the local `files.includes`. The base sets no
 `files.includes`, because Biome appends those lists rather than replacing them.
 
+If a consumer needs different `organizeImports` groups, write the local
+`assist` block in OBJECT form, not as the shorthand `"organizeImports": "on"`.
+The shorthand does not override the base groups. The object form does:
+
+```jsonc
+"assist": {
+  "enabled": true,
+  "actions": { "source": { "organizeImports": { "level": "on" } } }
+}
+```
+
 Use the extensionless subpath. `@minimal-agent/config/biome.json` fails with
 `Could not resolve ... module not found`, because Biome resolves through the
 `exports` map and does not add an extension.
