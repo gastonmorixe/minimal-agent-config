@@ -88,9 +88,10 @@ TS5108.
 ## Required peer packages
 
 `@biomejs/biome`, `oxlint`, `oxlint-tsgolint` (needed by `options.typeAware`)
-and `typescript` must be devDependencies in the consumer. Bun installs peers
-automatically, but the binaries must be at the consumer root where the scripts
-look for them.
+and `typescript` must be devDependencies in the consumer. Only `typescript` is
+optional in this package's peer set. Bun installs the other three peers
+automatically, verified on a clean `git+ssh` install, and `node_modules/.bin`
+then holds `biome`, `oxlint` and `tsgolint`.
 
 `oxlint` looks for the `tsgolint` binary at `node_modules/.bin/tsgolint`. The
 `oxlint-tsgolint` package provides that name.
