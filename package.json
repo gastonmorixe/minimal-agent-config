@@ -16,10 +16,10 @@
   },
   "files": ["biome.json", "oxlintrc.json", "tsconfig.base.json"],
   "peerDependencies": {
-    "@biomejs/biome": ">=2.5.15 <3",
-    "oxlint": ">=1.88.0 <2",
-    "oxlint-tsgolint": ">=7.0.2004 <8",
-    "typescript": ">=7.0.2 <8"
+    "@biomejs/biome": "2.6.6",
+    "oxlint": "1.92.0",
+    "oxlint-tsgolint": "7.0.2006",
+    "typescript": "7.0.2"
   },
   "peerDependenciesMeta": {
     "typescript": { "optional": true }
