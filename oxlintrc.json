@@ -12,6 +12,7 @@
     "typescript/no-unnecessary-type-assertion": "off",
     "typescript/no-unnecessary-boolean-literal-compare": "off",
     "typescript/restrict-template-expressions": "off",
+    "typescript/unbound-method": "off",
     "no-await-in-loop": "off",
     "no-control-regex": "off",
     "no-shadow": "off",
