@@ -22,7 +22,6 @@
     "typescript": ">=7.0.2 <8"
   },
   "peerDependenciesMeta": {
-    "oxlint-tsgolint": { "optional": true },
     "typescript": { "optional": true }
   },
   "engines": {
