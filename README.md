@@ -4,6 +4,9 @@ Shared Biome, oxlint and TypeScript config for the minimal-agent repos.
 
 Private. Pin it by git SHA, the same way the repos pin `@minimal-agent/core`.
 
+Consumers today: `minimal-agent-core`, `minimal-agent-cli`,
+`minimal-agent-plugins`. `minimal-agent-web` is not wired yet.
+
 ## What it contains
 
 | Export | File | Consumer line |
@@ -11,6 +14,25 @@ Private. Pin it by git SHA, the same way the repos pin `@minimal-agent/core`.
 | `@minimal-agent/config/biome` | `biome.json` | `"extends": ["@minimal-agent/config/biome"]` |
 | `@minimal-agent/config/oxlintrc.json` | `oxlintrc.json` | `"extends": ["./node_modules/@minimal-agent/config/oxlintrc.json"]` |
 | `@minimal-agent/config/tsconfig.json` | `tsconfig.base.json` | `"extends": "@minimal-agent/config/tsconfig.json"` |
+
+## What is in the base, and why
+
+`biome.json`: formatter (2-space indent, 100 columns), the custom
+`organizeImports` groups, double quotes, `asNeeded` semicolons, `all` trailing
+commas, JSON without trailing commas, and the Biome linter off.
+
+`oxlintrc.json`: the plugin list, `options.typeAware`,
+`options.reportUnusedDisableDirectives`, and the rule set that is policy for all
+three repos. Two rules are deliberately off there, with reasons recorded in the
+commits:
+
+- `typescript/unbound-method`: fires on `const { join } = await import(...)`.
+- `typescript/no-unsafe-enum-assignment`: fires on numeric literals passed to
+  enum fields in test fixtures.
+
+`tsconfig.base.json`: `strict`, `ESNext` target and module,
+`moduleResolution: bundler`, `esModuleInterop`, `allowImportingTsExtensions`,
+`noEmit`, `skipLibCheck`, `types: ["bun-types"]`. No `include`, no `exclude`.
 
 ## Consumer setup
 
@@ -21,6 +43,11 @@ Add the dependency:
   "@minimal-agent/config": "git+ssh://git@github.com/gastonmorixe/minimal-agent-config.git#<full-sha>"
 }
 ```
+
+Do not use `workspace:*` here. The submodules are separate install roots, and a
+standalone clone has no monorepo root above it, so `workspace:*` fails with
+`the root package depends on workspace ... not on disk`. A git+ssh SHA pin works
+in a standalone clone, in CI, and inside the root workspace.
 
 Then make three small edits per repo.
 
@@ -36,6 +63,8 @@ Then make three small edits per repo.
 
 Keep the local `$schema` and the local `files.includes`. The base sets no
 `files.includes`, because Biome appends those lists rather than replacing them.
+The `$schema` version must match the installed Biome, or Biome prints a schema
+mismatch notice on every run.
 
 If a consumer needs different `organizeImports` groups, write the local
 `assist` block in OBJECT form, not as the shorthand `"organizeImports": "on"`.
@@ -104,8 +133,31 @@ optional in this package's peer set. Bun installs the other three peers
 automatically, verified on a clean `git+ssh` install, and `node_modules/.bin`
 then holds `biome`, `oxlint` and `tsgolint`.
 
+The peers are pinned to exact versions on purpose. A range let Bun resolve
+Biome 2.6.6 for a repo that ran 2.5.15, so the shared base was tested against a
+binary the repos did not have.
+
 `oxlint` looks for the `tsgolint` binary at `node_modules/.bin/tsgolint`. The
 `oxlint-tsgolint` package provides that name.
+
+## Upgrading a tool
+
+1. Change the exact version in `package.json` `peerDependencies` here.
+2. Commit and push. Note the new SHA.
+3. In each consumer, bump the `@minimal-agent/config` pin and the matching
+   devDependency to the same version.
+4. Run `bun install` at the monorepo root, then `bun run check`.
+
+Expect fallout, and fix it rather than pinning back:
+
+- A new Biome formats more file types. 2.6 formats Markdown, which padded
+  tables across the repo. Keep that diff separate from a logic change.
+- A new Biome version needs the `$schema` URL bumped in every consumer, or
+  every run prints a schema-mismatch notice.
+- New oxlint rules become errors. Decide per rule: fix the code, or disable it
+  in the base with the reason in the commit message.
+- New `eslint-plugin-jsdoc` rules can require doc comments that were never
+  there. Add the comment; do not turn the rule off.
 
 ## Verify a consumer
 
