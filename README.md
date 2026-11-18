@@ -145,8 +145,15 @@ binary the repos did not have.
 1. Change the exact version in `package.json` `peerDependencies` here.
 2. Commit and push. Note the new SHA.
 3. In each consumer, bump the `@minimal-agent/config` pin and the matching
-   devDependency to the same version.
-4. Run `bun install` at the monorepo root, then `bun run check`.
+   devDependency to the same version. Core and plugins hold it in their
+   `workspaces.catalog`, cli and web in `devDependencies`.
+4. Change the same entry in the `catalog` of the monorepo root.
+5. Run `bun install` at the monorepo root, then `bun run check`. It runs
+   `bun run catalogs:check`, which fails while one of these places, or the
+   `peerDependencies` here, differs from the root catalog.
+6. The root install does not read a consumer's own `bun.lock`. Run
+   `bun run pins:lock` at the monorepo root to update each committed one,
+   commit it in its repo, then run `bun run pins:verify`.
 
 Expect fallout, and fix it rather than pinning back:
 
