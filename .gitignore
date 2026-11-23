@@ -1,3 +1,6 @@
 node_modules/
 bun.lock
 .DS_Store
+
+# Agent research: evidence logs, reports, scratch (local only)
+research/
